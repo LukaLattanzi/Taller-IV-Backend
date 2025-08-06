@@ -21,28 +21,53 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-@Service
-@Slf4j
-@RequiredArgsConstructor
+/**
+ * La clase `ProductServiceImpl` implementa las operaciones de la interfaz `ProductService` para 
+ * gestionar las operaciones relacionadas con productos. Este servicio maneja la lógica de negocio 
+ * que conecta los datos de productos con su correspondiente representación en la base de datos y 
+ * su presentación como respuesta a través de DTOs.
+ *
+ * **Propósito General**:
+ * - Implementar las operaciones CRUD (Crear, Leer, Actualizar, Eliminar) asociadas a productos.
+ * - Manejar la lógica de negocio, como la validación y la actualización de datos, antes de interactuar con la base de datos.
+ * - Manejar la subida y almacenamiento de imágenes asociadas a productos.
+ *
+ * **Características Principales**:
+ * - Uso de `ModelMapper` para la conversión de entidades a DTOs (y viceversa).
+ * - Uso de excepciones personalizadas (como `NotFoundException`) para un manejo claro de errores.
+ * - Control y validación de imágenes cargadas por los usuarios.
+ */
+
+@Service // Marca esta clase como un servicio gestionado por Spring.
+@Slf4j // Proporciona un mecanismo de registro para depurar o informar sobre eventos en tiempo de ejecución.
+@RequiredArgsConstructor // Genera un constructor con los parámetros necesarios para los campos finales.
 public class ProductServiceImpl implements ProductService {
 
-    private final ProductRepository productRepository;
-    private final ModelMapper modelMapper;
-    private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository; // Repositorio para realizar operaciones CRUD con la base de datos.
+    private final ModelMapper modelMapper; // Herramienta para mapear entre entidades y DTOs.
+    private final CategoryRepository categoryRepository; // Repositorio usado para validar categorías asociadas.
 
-    private static final String IMAGE_DIRECTORY = System.getProperty("user.dir") + "/product-image/";
+    private static final String IMAGE_DIRECTORY = System.getProperty("user.dir") + "/product-image/"; // Ruta para almacenar imágenes en el backend.
+    private static final String IMAGE_DIRECTOR_FRONTEND = "/path/to/frontend/public/products/"; // Ruta para almacenar imágenes en el frontend.
 
-    //AFTER YOUR FROTEND IS SET UP WROTE THIS SO THE IMAGE IS SAVED IN YOUR FRONTEND PUBLIC FOLDER
-    private static final String IMAGE_DIRECTOR_FRONTEND = "/Users/dennismac/phegonDev/ims-angular/public/products/";
-
-
+    /**
+     * Guarda un nuevo producto en la base de datos.
+     *
+     * @param productDTO DTO con la información del producto.
+     * @param imageFile Archivo de imagen asociado al producto.
+     * @return Respuesta indicando el estado de la operación.
+     *
+     * **Proceso**:
+     * 1. Valida la existencia de la categoría a través de su ID.
+     * 2. Convierte el `ProductDTO` en una entidad de tipo `Product`.
+     * 3. Si hay una imagen, guarda la imagen en el sistema de archivos y registra su URL.
+     * 4. Guarda el producto en la base de datos y devuelve una respuesta exitosa.
+     */
     @Override
     public Response saveProduct(ProductDTO productDTO, MultipartFile imageFile) {
-
         Category category = categoryRepository.findById(productDTO.getCategoryId())
-                .orElseThrow(()-> new NotFoundException("Category Not Found"));
+                .orElseThrow(() -> new NotFoundException("Category Not Found"));
 
-        //map out product dto to product entity
         Product productToSave = Product.builder()
                 .name(productDTO.getName())
                 .sku(productDTO.getSku())
@@ -52,12 +77,11 @@ public class ProductServiceImpl implements ProductService {
                 .category(category)
                 .build();
 
-        if (imageFile != null){
+        if (imageFile != null) {
             String imagePath = saveImageToFrontendPublicFolder(imageFile);
             productToSave.setImageUrl(imagePath);
         }
 
-        //save the product to our database
         productRepository.save(productToSave);
         return Response.builder()
                 .status(200)
@@ -65,63 +89,68 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
+    /**
+     * Actualiza un producto existente.
+     *
+     * @param productDTO DTO con los datos a actualizar.
+     * @param imageFile Archivo de imagen actualizado (opcional).
+     * @return Respuesta indicando el estado de la operación.
+     *
+     * **Proceso**:
+     * 1. Valida la existencia del producto por su ID.
+     * 2. Si se incluye una nueva imagen, se almacena y se actualiza el producto con la nueva URL de la imagen.
+     * 3. Si se proporciona una nueva categoría, se valida y se actualiza.
+     * 4. Se actualizan los campos proporcionados en el `DTO`.
+     * 5. Guarda los cambios en la base de datos y responde exitosamente.
+     */
     @Override
     public Response updateProduct(ProductDTO productDTO, MultipartFile imageFile) {
-
         Product existingProduct = productRepository.findById(productDTO.getProductId())
-                .orElseThrow(()-> new NotFoundException("Product Not Found"));
+                .orElseThrow(() -> new NotFoundException("Product Not Found"));
 
-        //check if image is associated with the update request
-        if (imageFile != null && !imageFile.isEmpty()){
+        if (imageFile != null && !imageFile.isEmpty()) {
             String imagePath = saveImageToFrontendPublicFolder(imageFile);
             existingProduct.setImageUrl(imagePath);
         }
-        //Check if category is to be changed for the product
-        if (productDTO.getCategoryId() != null && productDTO.getCategoryId() > 0){
 
+        if (productDTO.getCategoryId() != null && productDTO.getCategoryId() > 0) {
             Category category = categoryRepository.findById(productDTO.getCategoryId())
-                    .orElseThrow(()-> new NotFoundException("Category Not Found"));
+                    .orElseThrow(() -> new NotFoundException("Category Not Found"));
             existingProduct.setCategory(category);
         }
 
-        //check and update fiedls
-
-        if (productDTO.getName() !=null && !productDTO.getName().isBlank()){
+        if (productDTO.getName() != null && !productDTO.getName().isBlank()) {
             existingProduct.setName(productDTO.getName());
         }
-
-        if (productDTO.getSku() !=null && !productDTO.getSku().isBlank()){
+        if (productDTO.getSku() != null && !productDTO.getSku().isBlank()) {
             existingProduct.setSku(productDTO.getSku());
         }
-
-        if (productDTO.getDescription() !=null && !productDTO.getDescription().isBlank()){
+        if (productDTO.getDescription() != null && !productDTO.getDescription().isBlank()) {
             existingProduct.setDescription(productDTO.getDescription());
         }
-
-        if (productDTO.getPrice() !=null && productDTO.getPrice().compareTo(BigDecimal.ZERO) >=0){
+        if (productDTO.getPrice() != null && productDTO.getPrice().compareTo(BigDecimal.ZERO) >= 0) {
             existingProduct.setPrice(productDTO.getPrice());
         }
-
-        if (productDTO.getStockQuantity() !=null && productDTO.getStockQuantity() >=0){
+        if (productDTO.getStockQuantity() != null && productDTO.getStockQuantity() >= 0) {
             existingProduct.setStockQuantity(productDTO.getStockQuantity());
         }
 
-        //Update the product
         productRepository.save(existingProduct);
         return Response.builder()
                 .status(200)
-                .message("Product successfully Updated")
+                .message("Product Successfully Updated")
                 .build();
-
     }
 
+    /**
+     * Recupera todos los productos de la base de datos.
+     *
+     * @return Respuesta con la lista de productos.
+     */
     @Override
     public Response getAllProducts() {
-
         List<Product> products = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
-
         List<ProductDTO> productDTOS = modelMapper.map(products, new TypeToken<List<ProductDTO>>() {}.getType());
-
         return Response.builder()
                 .status(200)
                 .message("success")
@@ -129,13 +158,16 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
+    /**
+     * Recupera el detalle de un producto por su identificador.
+     *
+     * @param id ID del producto.
+     * @return Respuesta con los detalles del producto.
+     */
     @Override
     public Response getProductById(Long id) {
-
         Product product = productRepository.findById(id)
-                .orElseThrow(()-> new NotFoundException("Product Not Found"));
-
-
+                .orElseThrow(() -> new NotFoundException("Product Not Found"));
         return Response.builder()
                 .status(200)
                 .message("success")
@@ -143,84 +175,55 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
+    /**
+     * Elimina un producto de la base de datos.
+     *
+     * @param id Identificador del producto.
+     * @return Respuesta confirmando la eliminación.
+     *
+     * **Proceso**:
+     * 1. Valida la existencia del producto a través de su ID.
+     * 2. Elimina el producto de la base de datos.
+     * 3. Devuelve una respuesta indicando el éxito de la operación.
+     */
     @Override
     public Response deleteProduct(Long id) {
-
         productRepository.findById(id)
-                .orElseThrow(()-> new NotFoundException("Product Not Found"));
-
+                .orElseThrow(() -> new NotFoundException("Product Not Found"));
         productRepository.deleteById(id);
-
         return Response.builder()
                 .status(200)
                 .message("Product successfully deleted")
                 .build();
     }
 
-    private String saveImageToFrontendPublicFolder(MultipartFile imageFile){
-        //validate image check
-        if (!imageFile.getContentType().startsWith("image/")){
+    /**
+     * Método auxiliar para guardar imágenes en la carpeta pública del frontend.
+     *
+     * @param imageFile Archivo de imagen proporcionado.
+     * @return Ruta relativa donde se almacena la imagen.
+     */
+    private String saveImageToFrontendPublicFolder(MultipartFile imageFile) {
+        if (!imageFile.getContentType().startsWith("image/")) {
             throw new IllegalArgumentException("Only image files are allowed");
         }
-        //create the directory to store images if it doesn't exist
-        File directory = new File(IMAGE_DIRECTOR_FRONTEND);
 
-        if (!directory.exists()){
+        File directory = new File(IMAGE_DIRECTOR_FRONTEND);
+        if (!directory.exists()) {
             directory.mkdir();
             log.info("Directory was created");
         }
-        //generate unique file name for the image
+
         String uniqueFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-        //get the absolute path of the image
         String imagePath = IMAGE_DIRECTOR_FRONTEND + uniqueFileName;
 
         try {
-            File desctinationFile = new File(imagePath);
-            imageFile.transferTo(desctinationFile); //we are transfering(writing to this folder)
-
-        }catch (Exception e){
-            throw new IllegalArgumentException("Error occurend while saving image" + e.getMessage());
+            File destinationFile = new File(imagePath);
+            imageFile.transferTo(destinationFile);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error occurred while saving image: " + e.getMessage());
         }
 
-        return "products/"+uniqueFileName;
+        return "products/" + uniqueFileName;
     }
-
-    private String saveImage(MultipartFile imageFile){
-        //validate image check
-        if (!imageFile.getContentType().startsWith("image/")){
-            throw new IllegalArgumentException("Only image files are allowed");
-        }
-        //create the directory to store images if it doesn't exist
-        File directory = new File(IMAGE_DIRECTORY);
-
-        if (!directory.exists()){
-            directory.mkdir();
-            log.info("Directory was created");
-        }
-        //generate unique file name for the image
-        String uniqueFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-        //get the absolute path of the image
-        String imagePath = IMAGE_DIRECTORY + uniqueFileName;
-
-        try {
-            File desctinationFile = new File(imagePath);
-            imageFile.transferTo(desctinationFile); //we are transfering(writing to this folder)
-
-        }catch (Exception e){
-            throw new IllegalArgumentException("Error occurend while saving image" + e.getMessage());
-        }
-
-        return imagePath;
-    }
-
-
-
-
-
-
-
-
-
-
-
 }
