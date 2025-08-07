@@ -80,7 +80,7 @@ public class CategoryDTO {
     private Long id;
 
     // Nombre de la categoría (campo obligatorio).
-    @NotBlank(message = "Name is required")
+    @NotBlank(message = "El nombre es obligatorio")
     private String name;
 
 }

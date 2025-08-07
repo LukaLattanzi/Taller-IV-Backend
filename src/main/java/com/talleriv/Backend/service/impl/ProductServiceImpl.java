@@ -66,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Response saveProduct(ProductDTO productDTO, MultipartFile imageFile) {
         Category category = categoryRepository.findById(productDTO.getCategoryId())
-                .orElseThrow(() -> new NotFoundException("Category Not Found"));
+                .orElseThrow(() -> new NotFoundException("Categoria no encontrada"));
 
         Product productToSave = Product.builder()
                 .name(productDTO.getName())
@@ -85,7 +85,7 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(productToSave);
         return Response.builder()
                 .status(200)
-                .message("Product successfully saved")
+                .message("Producto creado exitosamente")
                 .build();
     }
 
@@ -106,7 +106,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Response updateProduct(ProductDTO productDTO, MultipartFile imageFile) {
         Product existingProduct = productRepository.findById(productDTO.getProductId())
-                .orElseThrow(() -> new NotFoundException("Product Not Found"));
+                .orElseThrow(() -> new NotFoundException("Producto no encontrado"));
 
         if (imageFile != null && !imageFile.isEmpty()) {
             String imagePath = saveImageToFrontendPublicFolder(imageFile);
@@ -115,7 +115,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (productDTO.getCategoryId() != null && productDTO.getCategoryId() > 0) {
             Category category = categoryRepository.findById(productDTO.getCategoryId())
-                    .orElseThrow(() -> new NotFoundException("Category Not Found"));
+                    .orElseThrow(() -> new NotFoundException("Categoria no encontrada"));
             existingProduct.setCategory(category);
         }
 
@@ -138,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(existingProduct);
         return Response.builder()
                 .status(200)
-                .message("Product Successfully Updated")
+                .message("Producto actualizado exitosamente")
                 .build();
     }
 
@@ -153,7 +153,7 @@ public class ProductServiceImpl implements ProductService {
         List<ProductDTO> productDTOS = modelMapper.map(products, new TypeToken<List<ProductDTO>>() {}.getType());
         return Response.builder()
                 .status(200)
-                .message("success")
+                .message("Exito al recuperar los productos")
                 .products(productDTOS)
                 .build();
     }
@@ -167,10 +167,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Response getProductById(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Product Not Found"));
+                .orElseThrow(() -> new NotFoundException("Producto no encontrado"));
         return Response.builder()
                 .status(200)
-                .message("success")
+                .message("Exito al recuperar el producto")
                 .product(modelMapper.map(product, ProductDTO.class))
                 .build();
     }
@@ -189,11 +189,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Response deleteProduct(Long id) {
         productRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Product Not Found"));
+                .orElseThrow(() -> new NotFoundException("Producto no encontrado"));
         productRepository.deleteById(id);
         return Response.builder()
                 .status(200)
-                .message("Product successfully deleted")
+                .message("Producto eliminado exitosamente")
                 .build();
     }
 
@@ -205,13 +205,13 @@ public class ProductServiceImpl implements ProductService {
      */
     private String saveImageToFrontendPublicFolder(MultipartFile imageFile) {
         if (!imageFile.getContentType().startsWith("image/")) {
-            throw new IllegalArgumentException("Only image files are allowed");
+            throw new IllegalArgumentException("Solo se permiten archivos de imagen.");
         }
 
         File directory = new File(IMAGE_DIRECTOR_FRONTEND);
         if (!directory.exists()) {
             directory.mkdir();
-            log.info("Directory was created");
+            log.info("Directorio creado");
         }
 
         String uniqueFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
@@ -221,7 +221,7 @@ public class ProductServiceImpl implements ProductService {
             File destinationFile = new File(imagePath);
             imageFile.transferTo(destinationFile);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error occurred while saving image: " + e.getMessage());
+            throw new IllegalArgumentException("Ocurrió un error al guardar la imagen" + e.getMessage());
         }
 
         return "products/" + uniqueFileName;

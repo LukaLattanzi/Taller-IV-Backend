@@ -79,11 +79,11 @@ import lombok.NoArgsConstructor;
 public class LoginRequest {
 
     // Correo electrónico del usuario (campo obligatorio).
-    @NotBlank(message = "Email is required")
+    @NotBlank(message = "El email es obligatorio")
     private String email;
 
     // Contraseña del usuario (campo obligatorio).
-    @NotBlank(message = "Password is required")
+    @NotBlank(message = "La contraseña es obligatoria")
     private String password;
 
 }

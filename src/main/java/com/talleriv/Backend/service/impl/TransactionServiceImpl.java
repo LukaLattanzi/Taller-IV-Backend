@@ -70,13 +70,13 @@ public class TransactionServiceImpl implements TransactionService {
         Long supplierId = transactionRequest.getSupplierId();
         Integer quantity = transactionRequest.getQuantity();
 
-        if (supplierId == null) throw new NameValueRequiredException("Supplier Id id Required");
+        if (supplierId == null) throw new NameValueRequiredException("Supplier id es obligatorio");
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException("Product Not Found"));
+                .orElseThrow(() -> new NotFoundException("Producto No Encontrado"));
 
         Supplier supplier = supplierRepository.findById(supplierId)
-                .orElseThrow(() -> new NotFoundException("Supplier Not Found"));
+                .orElseThrow(() -> new NotFoundException("Proveedor No Encontrado"));
 
         User user = userService.getCurrentLoggedInUser();
 
@@ -98,7 +98,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         return Response.builder()
                 .status(200)
-                .message("Transaction Made Successfully")
+                .message("Transaccion de Compra Exitosa")
                 .build();
     }
 
@@ -119,7 +119,7 @@ public class TransactionServiceImpl implements TransactionService {
         Integer quantity = transactionRequest.getQuantity();
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException("Product Not Found"));
+                .orElseThrow(() -> new NotFoundException("Producto no encontrado"));
 
         User user = userService.getCurrentLoggedInUser();
 
@@ -140,7 +140,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         return Response.builder()
                 .status(200)
-                .message("Transaction Sold Successfully")
+                .message("Transacción de Venta Exitosa")
                 .build();
     }
 
@@ -161,13 +161,13 @@ public class TransactionServiceImpl implements TransactionService {
         Long supplierId = transactionRequest.getSupplierId();
         Integer quantity = transactionRequest.getQuantity();
 
-        if (supplierId == null) throw new NameValueRequiredException("Supplier Id id Required");
+        if (supplierId == null) throw new NameValueRequiredException("Supplier id es obligatorio");
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException("Product Not Found"));
+                .orElseThrow(() -> new NotFoundException("Producto no encontrado"));
 
         Supplier supplier = supplierRepository.findById(supplierId)
-                .orElseThrow(() -> new NotFoundException("Supplier Not Found"));
+                .orElseThrow(() -> new NotFoundException("Supplier no encontrado"));
 
         User user = userService.getCurrentLoggedInUser();
 
@@ -189,7 +189,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         return Response.builder()
                 .status(200)
-                .message("Transaction Returned Successfully Initialized")
+                .message("Transacción de Devolución Exitosa")
                 .build();
     }
 
@@ -217,7 +217,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         return Response.builder()
                 .status(200)
-                .message("success")
+                .message("Exito al recuperar las transacciones")
                 .transactions(transactionDTOS)
                 .build();
     }
@@ -231,14 +231,14 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Response getTransactionById(Long id) {
         Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Transaction Not Found"));
+                .orElseThrow(() -> new NotFoundException("Transaccion no encontrada"));
 
         TransactionDTO transactionDTO = modelMapper.map(transaction, TransactionDTO.class);
         transactionDTO.getUser().setTransactions(null); // Evita recursión al devolver el usuario
 
         return Response.builder()
                 .status(200)
-                .message("success")
+                .message("Exito al recuperar la transacción")
                 .transaction(transactionDTO)
                 .build();
     }
@@ -265,7 +265,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         return Response.builder()
                 .status(200)
-                .message("success")
+                .message("Exito al recuperar las transacciones")
                 .transactions(transactionDTOS)
                 .build();
     }
@@ -280,7 +280,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Response updateTransactionStatus(Long transactionId, TransactionStatus transactionStatus) {
         Transaction existingTransaction = transactionRepository.findById(transactionId)
-                .orElseThrow(() -> new NotFoundException("Transaction Not Found"));
+                .orElseThrow(() -> new NotFoundException("Transacción no encontrada con ID: "));
 
         existingTransaction.setStatus(transactionStatus);
         existingTransaction.setUpdatedAt(LocalDateTime.now());
@@ -289,7 +289,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         return Response.builder()
                 .status(200)
-                .message("Transaction Status Successfully Updated")
+                .message("Transacción actualizada exitosamente")
                 .build();
     }
 }

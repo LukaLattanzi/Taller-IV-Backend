@@ -124,7 +124,7 @@ public class AuthFilter extends OncePerRequestFilter {
 
             // Validar el token y configurar el contexto de seguridad si es válido.
             if (StringUtils.hasText(email) && jwtUtils.isTokenValid(token, userDetails)) {
-                log.info("Token is valid, {}", email);
+                log.info("El token es valido, {}", email);
 
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities()
@@ -138,7 +138,7 @@ public class AuthFilter extends OncePerRequestFilter {
             // Continuar con la cadena de filtros.
             filterChain.doFilter(request, response);
         } catch (Exception e) {
-            log.error("Error occurred in AuthFilter: {}", e.getMessage());
+            log.error("Ocurrió un error en AuthFilter: {}", e.getMessage());
         }
     }
 

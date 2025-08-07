@@ -100,11 +100,11 @@ import lombok.NoArgsConstructor;
 public class TransactionRequest {
 
     // Identificador único del producto (campo obligatorio, valor debe ser positivo).
-    @Positive(message = "Product id is required")
+    @Positive(message = "El id del producto es obligatorio")
     private Long productId;
 
     // Cantidad de productos (campo obligatorio, valor debe ser positivo).
-    @Positive(message = "Quantity id is required")
+    @Positive(message = "La cantidad es obligatoria")
     private Integer quantity;
 
     // Identificador del proveedor relacionado con la transacción (opcional).

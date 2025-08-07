@@ -60,7 +60,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         return Response.builder()
                 .status(200)
-                .message("Category created successfully")
+                .message("Categoria creada exitosamente")
                 .build();
     }
 
@@ -82,7 +82,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         return Response.builder()
                 .status(200)
-                .message("success")
+                .message("Exito al recuperar las categorías")
                 .categories(categoryDTOS)
                 .build();
     }
@@ -103,12 +103,12 @@ public class CategoryServiceImpl implements CategoryService {
     public Response getCategoryById(Long id) {
 
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Category Not Found"));
+                .orElseThrow(() -> new NotFoundException("No se encontró la categoría con ID: " + id));
         CategoryDTO categoryDTO = modelMapper.map(category, CategoryDTO.class);
 
         return Response.builder()
                 .status(200)
-                .message("success")
+                .message("Categoría encontrada exitosamente")
                 .category(categoryDTO)
                 .build();
     }
@@ -131,14 +131,14 @@ public class CategoryServiceImpl implements CategoryService {
     public Response updateCategory(Long id, CategoryDTO categoryDTO) {
 
         Category existingCategory = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Category Not Found"));
+                .orElseThrow(() -> new NotFoundException("Categoria no encontrada con ID: " + id));
 
         existingCategory.setName(categoryDTO.getName());
         categoryRepository.save(existingCategory);
 
         return Response.builder()
                 .status(200)
-                .message("Category Successfully Updated")
+                .message("Categoría actualizada exitosamente")
                 .build();
     }
 
@@ -158,13 +158,13 @@ public class CategoryServiceImpl implements CategoryService {
     public Response deleteCategory(Long id) {
 
         categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Category Not Found"));
+                .orElseThrow(() -> new NotFoundException("No se encontró la categoría con ID: " + id));
 
         categoryRepository.deleteById(id);
 
         return Response.builder()
                 .status(200)
-                .message("Category Successfully Deleted")
+                .message("Categoría eliminada exitosamente")
                 .build();
     }
 }

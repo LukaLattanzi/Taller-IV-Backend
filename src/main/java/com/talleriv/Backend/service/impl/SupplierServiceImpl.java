@@ -52,7 +52,7 @@ public class SupplierServiceImpl implements SupplierService {
 
         return Response.builder()
                 .status(200)
-                .message("Supplier added successfully")
+                .message("Supplier creado exitosamente")
                 .build();
     }
 
@@ -73,7 +73,7 @@ public class SupplierServiceImpl implements SupplierService {
     public Response updateSupplier(Long id, SupplierDTO supplierDTO) {
 
         Supplier existingSupplier = supplierRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Supplier Not Found"));
+                .orElseThrow(() -> new NotFoundException("Supplier no encontrado"));
 
         if (supplierDTO.getName() != null) existingSupplier.setName(supplierDTO.getName());
         if (supplierDTO.getAddress() != null) existingSupplier.setAddress(supplierDTO.getAddress());
@@ -82,7 +82,7 @@ public class SupplierServiceImpl implements SupplierService {
 
         return Response.builder()
                 .status(200)
-                .message("Supplier Successfully Updated")
+                .message("Supplier actualizado exitosamente")
                 .build();
     }
 
@@ -105,7 +105,7 @@ public class SupplierServiceImpl implements SupplierService {
 
         return Response.builder()
                 .status(200)
-                .message("success")
+                .message("Exito al recuperar los suppliers")
                 .suppliers(supplierDTOS)
                 .build();
     }
@@ -125,13 +125,13 @@ public class SupplierServiceImpl implements SupplierService {
     public Response getSupplierById(Long id) {
 
         Supplier supplier = supplierRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Supplier Not Found"));
+                .orElseThrow(() -> new NotFoundException("Supplier no encontrado"));
 
         SupplierDTO supplierDTO = modelMapper.map(supplier, SupplierDTO.class);
 
         return Response.builder()
                 .status(200)
-                .message("success")
+                .message("Exito al recuperar el supplier")
                 .supplier(supplierDTO)
                 .build();
     }
@@ -152,13 +152,13 @@ public class SupplierServiceImpl implements SupplierService {
     public Response deleteSupplier(Long id) {
 
         supplierRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Supplier Not Found"));
+                .orElseThrow(() -> new NotFoundException("Supplier no encontrado"));
 
         supplierRepository.deleteById(id);
 
         return Response.builder()
                 .status(200)
-                .message("Supplier Successfully Deleted")
+                .message("Supplier eliminado exitosamente")
                 .build();
     }
 }

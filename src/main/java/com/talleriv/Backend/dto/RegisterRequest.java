@@ -102,19 +102,19 @@ import lombok.NoArgsConstructor;
 public class RegisterRequest {
 
     // Nombre completo del usuario (campo obligatorio).
-    @NotBlank(message = "Name is required")
+    @NotBlank(message = "El nombre es obligatorio")
     private String name;
 
     // Dirección de correo electrónico (campo obligatorio).
-    @NotBlank(message = "Email is required")
+    @NotBlank(message = "El email es obligatorio")
     private String email;
 
     // Contraseña del usuario (campo obligatorio).
-    @NotBlank(message = "Password is required")
+    @NotBlank(message = "La contraseña es obligatoria")
     private String password;
 
     // Número de teléfono del usuario (campo obligatorio).
-    @NotBlank(message = "PhoneNumber is required")
+    @NotBlank(message = "El número de teléfono es obligatorio")
     private String phoneNumber;
 
     // Rol asignado al usuario (opcional, ejemplos: ADMIN o USER).

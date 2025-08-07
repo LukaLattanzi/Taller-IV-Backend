@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
         return Response.builder()
                 .status(200)
-                .message("user created successfully")
+                .message("Usuario registrado exitosamente")
                 .build();
     }
 
@@ -95,17 +95,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public Response loginUser(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new NotFoundException("Email not Found"));
+                .orElseThrow(() -> new NotFoundException("Email no encontrado"));
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException("password does not match");
+            throw new InvalidCredentialsException("La contraseña es incorrecta");
         }
 
         String token = jwtUtils.generateToken(user.getEmail());
 
         return Response.builder()
                 .status(200)
-                .message("user logged in successfully")
+                .message("Usuario autenticado exitosamente")
                 .role(user.getRole())
                 .token(token)
                 .expirationTime("6 month")
@@ -132,7 +132,7 @@ public class UserServiceImpl implements UserService {
 
         return Response.builder()
                 .status(200)
-                .message("success")
+                .message("Exito al recuperar los usuarios")
                 .users(userDTOS)
                 .build();
     }
@@ -154,7 +154,7 @@ public class UserServiceImpl implements UserService {
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User Not Found"));
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
         user.setTransactions(null);
 
@@ -177,7 +177,7 @@ public class UserServiceImpl implements UserService {
     public Response updateUser(Long id, UserDTO userDTO) {
 
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User Not Found"));
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
         if (userDTO.getEmail() != null) existingUser.setEmail(userDTO.getEmail());
         if (userDTO.getName() != null) existingUser.setName(userDTO.getName());
@@ -192,7 +192,7 @@ public class UserServiceImpl implements UserService {
 
         return Response.builder()
                 .status(200)
-                .message("User Successfully updated")
+                .message("Usuario actualizado exitosamente")
                 .build();
     }
 
@@ -210,13 +210,13 @@ public class UserServiceImpl implements UserService {
     public Response deleteUser(Long id) {
 
         userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User Not Found"));
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
         userRepository.deleteById(id);
 
         return Response.builder()
                 .status(200)
-                .message("User Successfully Deleted")
+                .message("Usuario eliminado exitosamente")
                 .build();
     }
 
@@ -234,7 +234,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Response getUserTransactions(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User Not Found"));
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
         UserDTO userDTO = modelMapper.map(user, UserDTO.class);
 
@@ -245,7 +245,7 @@ public class UserServiceImpl implements UserService {
 
         return Response.builder()
                 .status(200)
-                .message("success")
+                .message("Exito al recuperar las transacciones del usuario")
                 .user(userDTO)
                 .build();
     }

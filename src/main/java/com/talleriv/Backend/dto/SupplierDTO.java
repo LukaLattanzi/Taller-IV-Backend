@@ -100,7 +100,7 @@ public class SupplierDTO {
     private Long id;
 
     // Nombre del proveedor (obligatorio).
-    @NotBlank(message = "Name is required")
+    @NotBlank(message = "El nombre es obligatorio")
     private String name;
 
     // Dirección del proveedor (opcional).
