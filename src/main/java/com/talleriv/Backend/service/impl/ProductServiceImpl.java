@@ -48,7 +48,7 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository; // Repositorio usado para validar categorías asociadas.
 
     private static final String IMAGE_DIRECTORY = System.getProperty("user.dir") + "/product-image/"; // Ruta para almacenar imágenes en el backend.
-    private static final String IMAGE_DIRECTOR_FRONTEND = "/path/to/frontend/public/products/"; // Ruta para almacenar imágenes en el frontend.
+    private static final String IMAGE_DIRECTOR_FRONTEND = "/home/luka-lattanzi/Documentos/InventoryManagementSystem/Frontend/public/products/"; // Ruta para almacenar imágenes en el frontend.
 
     /**
      * Guarda un nuevo producto en la base de datos.
